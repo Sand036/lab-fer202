@@ -1,45 +1,82 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import { AuthContext } from "@/contexts/AuthContext";
+
 export default function LoginPage() {
+    const auth = useContext(AuthContext);
+
+    const router = useRouter();
+
+    if (!auth) {
+        throw new Error(
+            "LoginPage must be used inside AuthProvider"
+        );
+    }
+
+    const { signIn } = auth;
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
-    const [success, setSuccess] = useState("");
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const [authError, setAuthError] = useState("");
+
+    const handleSubmit = async (
+        e: React.FormEvent<HTMLFormElement>
+    ) => {
         e.preventDefault();
 
         setEmailError("");
         setPasswordError("");
-        setSuccess("");
+        setAuthError("");
 
         let isValid = true;
 
-        // Validate email
+        // Email validation
         if (email.trim() === "") {
             setEmailError("Email is required");
             isValid = false;
         } else if (!email.includes("@")) {
-            setEmailError("Please enter a valid email address");
+            setEmailError(
+                "Please enter a valid email address"
+            );
             isValid = false;
         }
 
-        // Validate password
+        // Password validation
         if (password.trim() === "") {
             setPasswordError("Password is required");
             isValid = false;
         }
 
-        if (isValid) {
-            setSuccess("Login successful (demo)");
+        // Stop if client-side validation fails
+        if (!isValid) {
+            return;
         }
+
+        // Real Supabase login
+        const { error } = await signIn(
+            email,
+            password
+        );
+
+        // Supabase authentication error
+        if (error) {
+            setAuthError(error.message);
+            return;
+        }
+
+        // Login successful
+        router.replace("/");
     };
 
     return (
@@ -107,7 +144,9 @@ export default function LoginPage() {
                             onChange={(e) => {
                                 setPassword(e.target.value);
 
-                                if (e.target.value.trim() !== "") {
+                                if (
+                                    e.target.value.trim() !== ""
+                                ) {
                                     setPasswordError("");
                                 }
                             }}
@@ -123,6 +162,7 @@ export default function LoginPage() {
                         )}
                     </div>
 
+                    {/* Submit */}
                     <Button
                         type="submit"
                         className="w-full"
@@ -131,12 +171,13 @@ export default function LoginPage() {
                         Login
                     </Button>
 
-                    {success && (
+                    {/* Supabase error */}
+                    {authError && (
                         <p
-                            data-testid="form-success"
-                            className="mt-4 text-center text-sm text-green-600"
+                            data-testid="error-auth"
+                            className="mt-4 text-center text-sm text-red-500"
                         >
-                            {success}
+                            {authError}
                         </p>
                     )}
                 </form>

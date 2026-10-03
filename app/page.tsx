@@ -1,38 +1,12 @@
-import Link from "next/link";
+import Header from "@/components/Header";
 
-import { buttonVariants } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
 import { products } from "@/data/products";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="border-b bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-          <h1 className="text-2xl font-bold">
-            My Store
-          </h1>
-
-          <div className="flex gap-3">
-            <Link
-              href="/login"
-              className={buttonVariants()}
-              data-testid="btn-login"
-            >
-              Login
-            </Link>
-
-            <Link
-              href="/register"
-              className={buttonVariants({ variant: "outline" })}
-              data-testid="btn-register"
-            >
-              Register
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Product Section */}
       <section className="mx-auto max-w-7xl px-4 py-10">

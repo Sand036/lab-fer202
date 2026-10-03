@@ -1,50 +1,72 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useContext } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import { AuthContext } from "@/contexts/AuthContext";
+
 export default function RegisterPage() {
+    const auth = useContext(AuthContext);
+
+    if (!auth) {
+        throw new Error(
+            "RegisterPage must be used inside AuthProvider"
+        );
+    }
+
+    const { signUp } = auth;
+
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] =
+        useState("");
 
     const [nameError, setNameError] = useState("");
     const [emailError, setEmailError] = useState("");
-    const [passwordError, setPasswordError] = useState("");
-    const [confirmPasswordError, setConfirmPasswordError] = useState("");
-    const [success, setSuccess] = useState("");
+    const [passwordError, setPasswordError] =
+        useState("");
+    const [confirmPasswordError, setConfirmPasswordError] =
+        useState("");
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const [success, setSuccess] = useState("");
+    const [authError, setAuthError] = useState("");
+
+    const handleSubmit = async (
+        e: React.FormEvent<HTMLFormElement>
+    ) => {
         e.preventDefault();
 
-        // Clear previous messages
         setNameError("");
         setEmailError("");
         setPasswordError("");
         setConfirmPasswordError("");
         setSuccess("");
+        setAuthError("");
 
         let isValid = true;
 
-        // Validate full name
+        // Name validation
         if (name.trim() === "") {
             setNameError("Full name is required");
             isValid = false;
         }
 
-        // Validate email
+        // Email validation
         if (email.trim() === "") {
             setEmailError("Email is required");
             isValid = false;
         } else if (!email.includes("@")) {
-            setEmailError("Please enter a valid email address");
+            setEmailError(
+                "Please enter a valid email address"
+            );
             isValid = false;
         }
 
-        // Validate password
+        // Password validation
         if (password.trim() === "") {
             setPasswordError("Password is required");
             isValid = false;
@@ -55,7 +77,7 @@ export default function RegisterPage() {
             isValid = false;
         }
 
-        // Validate confirm password
+        // Confirm password validation
         if (confirmPassword.trim() === "") {
             setConfirmPasswordError(
                 "Confirm password is required"
@@ -68,9 +90,19 @@ export default function RegisterPage() {
             isValid = false;
         }
 
-        // Success
+        // Supabase registration
         if (isValid) {
-            setSuccess("Registration successful (demo)");
+            const { error } = await signUp(
+                email,
+                password
+            );
+
+            if (error) {
+                setAuthError(error.message);
+                return;
+            }
+
+            setSuccess("Registration successful");
         }
     };
 
@@ -88,7 +120,6 @@ export default function RegisterPage() {
                     noValidate
                     onSubmit={handleSubmit}
                 >
-                    {/* Full Name */}
                     <div className="form-group">
                         <Label htmlFor="name">
                             Full Name
@@ -104,7 +135,9 @@ export default function RegisterPage() {
                             onChange={(e) => {
                                 setName(e.target.value);
 
-                                if (e.target.value.trim() !== "") {
+                                if (
+                                    e.target.value.trim() !== ""
+                                ) {
                                     setNameError("");
                                 }
                             }}
@@ -120,7 +153,6 @@ export default function RegisterPage() {
                         )}
                     </div>
 
-                    {/* Email */}
                     <div className="form-group">
                         <Label htmlFor="email">
                             Email
@@ -155,7 +187,6 @@ export default function RegisterPage() {
                         )}
                     </div>
 
-                    {/* Password */}
                     <div className="form-group">
                         <Label htmlFor="password">
                             Password
@@ -171,11 +202,15 @@ export default function RegisterPage() {
                             onChange={(e) => {
                                 setPassword(e.target.value);
 
-                                if (e.target.value.trim() === "") {
+                                if (
+                                    e.target.value.trim() === ""
+                                ) {
                                     return;
                                 }
 
-                                if (e.target.value.length >= 6) {
+                                if (
+                                    e.target.value.length >= 6
+                                ) {
                                     setPasswordError("");
                                 }
                             }}
@@ -191,7 +226,6 @@ export default function RegisterPage() {
                         )}
                     </div>
 
-                    {/* Confirm Password */}
                     <div className="form-group">
                         <Label htmlFor="confirm-password">
                             Confirm Password
@@ -205,7 +239,9 @@ export default function RegisterPage() {
                             value={confirmPassword}
                             data-testid="register-confirm-password"
                             onChange={(e) => {
-                                setConfirmPassword(e.target.value);
+                                setConfirmPassword(
+                                    e.target.value
+                                );
 
                                 if (
                                     e.target.value !== "" &&
@@ -226,7 +262,6 @@ export default function RegisterPage() {
                         )}
                     </div>
 
-                    {/* Submit */}
                     <Button
                         type="submit"
                         className="w-full"
@@ -235,7 +270,15 @@ export default function RegisterPage() {
                         Register
                     </Button>
 
-                    {/* Success */}
+                    {authError && (
+                        <p
+                            data-testid="error-auth"
+                            className="mt-4 text-center text-sm text-red-500"
+                        >
+                            {authError}
+                        </p>
+                    )}
+
                     {success && (
                         <p
                             data-testid="form-success"
