@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useContext } from "react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -107,11 +108,21 @@ export default function RegisterPage() {
     };
 
     return (
-        <main className="login-page">
-            <div className="login-container">
-                <h1>Register</h1>
+        <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-10">
+            <div className="w-full max-w-md rounded-2xl border bg-white p-8 shadow-sm">
+                {/* MỚI: tên cửa hàng, bấm để về trang chủ */}
+                <Link
+                    href="/"
+                    className="mb-6 block text-center text-lg font-bold hover:underline"
+                >
+                    My Store
+                </Link>
 
-                <p>
+                <h1 className="text-center text-2xl font-bold">
+                    Register
+                </h1>
+
+                <p className="mt-2 text-center text-sm text-gray-500">
                     Create a new account to get started.
                 </p>
 
@@ -119,8 +130,9 @@ export default function RegisterPage() {
                     data-testid="register-form"
                     noValidate
                     onSubmit={handleSubmit}
+                    className="mt-8 space-y-5"
                 >
-                    <div className="form-group">
+                    <div className="space-y-1.5">
                         <Label htmlFor="name">
                             Full Name
                         </Label>
@@ -132,6 +144,7 @@ export default function RegisterPage() {
                             placeholder="Enter your full name"
                             value={name}
                             data-testid="register-name"
+                            className="h-11!"
                             onChange={(e) => {
                                 setName(e.target.value);
 
@@ -153,7 +166,7 @@ export default function RegisterPage() {
                         )}
                     </div>
 
-                    <div className="form-group">
+                    <div className="space-y-1.5">
                         <Label htmlFor="email">
                             Email
                         </Label>
@@ -165,6 +178,7 @@ export default function RegisterPage() {
                             placeholder="Enter your email"
                             value={email}
                             data-testid="register-email"
+                            className="h-11!"
                             onChange={(e) => {
                                 setEmail(e.target.value);
 
@@ -187,7 +201,7 @@ export default function RegisterPage() {
                         )}
                     </div>
 
-                    <div className="form-group">
+                    <div className="space-y-1.5">
                         <Label htmlFor="password">
                             Password
                         </Label>
@@ -199,6 +213,7 @@ export default function RegisterPage() {
                             placeholder="Enter your password"
                             value={password}
                             data-testid="register-password"
+                            className="h-11!"
                             onChange={(e) => {
                                 setPassword(e.target.value);
 
@@ -226,7 +241,7 @@ export default function RegisterPage() {
                         )}
                     </div>
 
-                    <div className="form-group">
+                    <div className="space-y-1.5">
                         <Label htmlFor="confirm-password">
                             Confirm Password
                         </Label>
@@ -238,6 +253,7 @@ export default function RegisterPage() {
                             placeholder="Confirm your password"
                             value={confirmPassword}
                             data-testid="register-confirm-password"
+                            className="h-11!"
                             onChange={(e) => {
                                 setConfirmPassword(
                                     e.target.value
@@ -264,7 +280,7 @@ export default function RegisterPage() {
 
                     <Button
                         type="submit"
-                        className="w-full"
+                        className="h-11! w-full text-base!"
                         data-testid="register-submit"
                     >
                         Register
@@ -273,7 +289,7 @@ export default function RegisterPage() {
                     {authError && (
                         <p
                             data-testid="error-auth"
-                            className="mt-4 text-center text-sm text-red-500"
+                            className="text-center text-sm text-red-500"
                         >
                             {authError}
                         </p>
@@ -282,12 +298,24 @@ export default function RegisterPage() {
                     {success && (
                         <p
                             data-testid="form-success"
-                            className="mt-4 text-center text-sm text-green-600"
+                            className="text-center text-sm text-green-600"
                         >
                             {success}
                         </p>
                     )}
                 </form>
+
+                {/* MỚI: liên kết sang trang đăng nhập, nằm dưới nút Register */}
+                <p className="mt-6 border-t pt-6 text-center text-sm text-gray-600">
+                    Already registered?{" "}
+                    <Link
+                        href="/login"
+                        data-testid="link-login"
+                        className="font-semibold text-black hover:underline"
+                    >
+                        Login
+                    </Link>
+                </p>
             </div>
         </main>
     );

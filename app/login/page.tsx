@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useContext } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -80,11 +81,21 @@ export default function LoginPage() {
     };
 
     return (
-        <main className="login-page">
-            <div className="login-container">
-                <h1>Login</h1>
+        <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-10">
+            <div className="w-full max-w-md rounded-2xl border bg-white p-8 shadow-sm">
+                {/* MỚI: tên cửa hàng, bấm để về trang chủ */}
+                <Link
+                    href="/"
+                    className="mb-6 block text-center text-lg font-bold hover:underline"
+                >
+                    My Store
+                </Link>
 
-                <p>
+                <h1 className="text-center text-2xl font-bold">
+                    Login
+                </h1>
+
+                <p className="mt-2 text-center text-sm text-gray-500">
                     Welcome back! Please login to your account.
                 </p>
 
@@ -92,9 +103,10 @@ export default function LoginPage() {
                     data-testid="login-form"
                     noValidate
                     onSubmit={handleSubmit}
+                    className="mt-8 space-y-5"
                 >
                     {/* Email */}
-                    <div className="form-group">
+                    <div className="space-y-1.5">
                         <Label htmlFor="email">
                             Email
                         </Label>
@@ -106,6 +118,7 @@ export default function LoginPage() {
                             placeholder="Enter your email"
                             value={email}
                             data-testid="login-email"
+                            className="h-11!"
                             onChange={(e) => {
                                 setEmail(e.target.value);
 
@@ -129,7 +142,7 @@ export default function LoginPage() {
                     </div>
 
                     {/* Password */}
-                    <div className="form-group">
+                    <div className="space-y-1.5">
                         <Label htmlFor="password">
                             Password
                         </Label>
@@ -141,6 +154,7 @@ export default function LoginPage() {
                             placeholder="Enter your password"
                             value={password}
                             data-testid="login-password"
+                            className="h-11!"
                             onChange={(e) => {
                                 setPassword(e.target.value);
 
@@ -165,7 +179,7 @@ export default function LoginPage() {
                     {/* Submit */}
                     <Button
                         type="submit"
-                        className="w-full"
+                        className="h-11! w-full text-base!"
                         data-testid="login-submit"
                     >
                         Login
@@ -175,12 +189,24 @@ export default function LoginPage() {
                     {authError && (
                         <p
                             data-testid="error-auth"
-                            className="mt-4 text-center text-sm text-red-500"
+                            className="text-center text-sm text-red-500"
                         >
                             {authError}
                         </p>
                     )}
                 </form>
+
+                {/* MỚI: liên kết sang trang đăng ký */}
+                <p className="mt-6 border-t pt-6 text-center text-sm text-gray-600">
+                    Don&apos;t have an account?{" "}
+                    <Link
+                        href="/register"
+                        data-testid="link-register"
+                        className="font-semibold text-black hover:underline"
+                    >
+                        Register
+                    </Link>
+                </p>
             </div>
         </main>
     );
