@@ -2,6 +2,7 @@
 
 import {
     createContext,
+    useContext,
     useEffect,
     useState,
     type ReactNode,
@@ -129,4 +130,12 @@ export function AuthProvider({
             {children}
         </AuthContext.Provider>
     );
+}
+// Hook tiện dụng để lấy user, session, loading, signIn, signOut... ở component khác
+export function useAuth() {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error("useAuth must be used within AuthProvider");
+    }
+    return context;
 }

@@ -5,9 +5,14 @@ import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
 import { AuthContext } from "@/contexts/AuthContext";
+import { useFavorites } from "@/contexts/FavoritesContext";
 
+
+const bigButton = "h-10! px-6! text-base!";
+const authButtonWidth = "w-32! justify-center";
 export default function Header() {
     const auth = useContext(AuthContext);
+    const { favorites, favoritesLoading } = useFavorites();
 
     if (!auth) {
         throw new Error(
@@ -24,10 +29,9 @@ export default function Header() {
     return (
         <header className="border-b bg-white">
             <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-                {/* Logo / Store name */}
-                <h1 className="text-2xl font-bold">
+                <Link href="/" className="text-3xl font-bold">
                     My Store
-                </h1>
+                </Link>
 
                 {/* Authentication area */}
                 {!loading && (
@@ -36,7 +40,7 @@ export default function Header() {
                             <>
                                 <Link
                                     href="/login"
-                                    className={buttonVariants()}
+                                    className={`${buttonVariants()} ${bigButton} ${authButtonWidth}`}
                                     data-testid="btn-login"
                                 >
                                     Login
@@ -44,9 +48,9 @@ export default function Header() {
 
                                 <Link
                                     href="/register"
-                                    className={buttonVariants({
+                                    className={`${buttonVariants({
                                         variant: "outline",
-                                    })}
+                                    })} ${bigButton} ${authButtonWidth} border-black!`}
                                     data-testid="btn-register"
                                 >
                                     Register
@@ -54,19 +58,34 @@ export default function Header() {
                             </>
                         ) : (
                             <>
-                                <span
+                                <Link
+                                    href="/favorites"
+                                    className={`${buttonVariants({
+                                        variant: "outline",
+                                    })} ${bigButton} border-gray-300!`}
+                                    data-testid="link-favorites"
+                                >
+                                    Favorites (
+                                    <span data-testid="favorites-count">
+                                        {favoritesLoading
+                                            ? "…"
+                                            : favorites.length}
+                                    </span>
+                                    )
+                                </Link>
+
+                                <Link
+                                    href="/account"
                                     data-testid="user-email"
-                                    className="text-sm font-medium"
+                                    className="inline-flex h-10 items-center rounded-lg border border-gray-300 px-4 text-sm font-medium transition hover:bg-gray-100"
                                 >
                                     {user.email}
-                                </span>
+                                </Link>
 
                                 <button
                                     type="button"
                                     onClick={handleLogout}
-                                    className={buttonVariants({
-                                        variant: "outline",
-                                    })}
+                                    className={`${buttonVariants()} ${bigButton} ${authButtonWidth}`}
                                     data-testid="btn-logout"
                                 >
                                     Logout
