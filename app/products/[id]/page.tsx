@@ -5,11 +5,12 @@ import { products } from "@/data/products";
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import FavoriteButton from "@/components/FavoriteButton";
-import StarRating from "@/components/StarRating"; // MỚI
+import ReviewsSection from "@/components/ReviewsSection"; // MỚI
 import { buttonVariants } from "@/components/ui/button";
-import { getProductReviews } from "@/lib/reviews"; // MỚI
+import { ReviewsProvider } from "@/contexts/ReviewsContext"; // MỚI
+import { getProductReviews } from "@/lib/reviews";
 
-// MỚI: chỉ các id trong generateStaticParams mới tồn tại, id khác là 404 thật
+// Chỉ các id trong generateStaticParams mới tồn tại, id khác là 404 thật
 export const dynamicParams = false;
 
 type ProductDetailPageProps = {
@@ -17,16 +18,6 @@ type ProductDetailPageProps = {
 };
 
 type Product = (typeof products)[number];
-
-// MỚI: định dạng ngày cố định (UTC) để HTML luôn giống nhau
-function formatDate(value: string) {
-    return new Date(value).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        timeZone: "UTC",
-    });
-}
 
 export async function generateStaticParams() {
     return products.map((product) => ({
@@ -65,8 +56,8 @@ export default async function ProductDetailPage({
         notFound();
     }
 
-    // MỚI: đọc đánh giá trên server bằng anon key
-    const { average, count, reviews } = await getProductReviews(product.id);
+    // Đọc đánh giá trên server bằng anon key, rồi truyền xuống qua props
+    const { reviews } = await getProductReviews(product.id);
 
     // Sản phẩm liên quan: bỏ sản phẩm hiện tại, ưu tiên cùng danh mục, lấy tối đa 3
     const related = products
@@ -165,6 +156,7 @@ export default async function ProductDetailPage({
                         <div className="mt-8 flex items-center gap-3">
                             <Link
                                 href="/"
+                                data-testid="link-back"
                                 className={`${buttonVariants()} h-10! px-6! text-base!`}
                             >
                                 Back to Store
@@ -176,120 +168,18 @@ export default async function ProductDetailPage({
                     </div>
                 </div>
 
-                {/* MỚI: khối đánh giá, được render sẵn trong HTML của server */}
+                {/* MỚI: khu vực đánh giá. Provider bọc CHỈ phần này, không bọc cả app */}
                 <section id="reviews" className="mt-14">
                     <h2 className="mb-6 text-xl font-bold">
                         Customer reviews
                     </h2>
 
-                    <div className="grid gap-6 lg:grid-cols-3">
-                        {/* Tổng hợp: điểm trung bình và số lượng */}
-                        <aside className="h-fit rounded-2xl border bg-white p-6 shadow-sm">
-                            <p className="text-sm text-gray-500">
-                                Average rating
-                            </p>
-
-                            <div className="mt-2 flex items-center gap-4">
-                                {/* Chỉ chứa số thuần để script đọc được */}
-                                <span
-                                    data-testid="rating-average"
-                                    className="text-5xl font-bold"
-                                >
-                                    {average}
-                                </span>
-
-                                <div>
-                                    <StarRating
-                                        value={average}
-                                        className="text-xl"
-                                    />
-                                    <p className="text-sm text-gray-500">
-                                        out of 5
-                                    </p>
-                                </div>
-                            </div>
-
-                            <p className="mt-4 text-sm text-gray-600">
-                                <span
-                                    data-testid="review-count"
-                                    className="font-semibold"
-                                >
-                                    {count}
-                                </span>{" "}
-                                {count === 1 ? "review" : "reviews"}
-                            </p>
-                        </aside>
-
-                        {/* Danh sách đánh giá (Bước 8 sẽ thêm form phía trên) */}
-                        <div className="lg:col-span-2">
-                            {count === 0 ? (
-                                <p
-                                    data-testid="reviews-empty"
-                                    className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-6 py-10 text-center text-gray-500"
-                                >
-                                    No reviews yet. Be the first to review this
-                                    product.
-                                </p>
-                            ) : (
-                                <ul className="space-y-4">
-                                    {reviews.map((review) => (
-                                        <li
-                                            key={review.id}
-                                            data-testid="review-item"
-                                            className="rounded-2xl border bg-white p-5 shadow-sm"
-                                        >
-                                            <div className="flex flex-wrap items-center justify-between gap-2">
-                                                <div className="flex items-center gap-3">
-                                                    <span
-                                                        data-testid="review-author"
-                                                        className="font-semibold"
-                                                    >
-                                                        {review.author ||
-                                                            "Anonymous"}
-                                                    </span>
-
-                                                    <span className="flex items-center gap-1.5 text-sm">
-                                                        <StarRating
-                                                            value={
-                                                                review.rating
-                                                            }
-                                                        />
-                                                        <span>
-                                                            <span
-                                                                data-testid="review-rating"
-                                                                className="font-medium"
-                                                            >
-                                                                {review.rating}
-                                                            </span>
-                                                            /5
-                                                        </span>
-                                                    </span>
-                                                </div>
-
-                                                <time
-                                                    dateTime={
-                                                        review.created_at
-                                                    }
-                                                    className="text-xs text-gray-500"
-                                                >
-                                                    {formatDate(
-                                                        review.created_at
-                                                    )}
-                                                </time>
-                                            </div>
-
-                                            <p
-                                                data-testid="review-comment"
-                                                className="mt-3 whitespace-pre-wrap break-words leading-7 text-gray-700"
-                                            >
-                                                {review.comment}
-                                            </p>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-                    </div>
+                    <ReviewsProvider
+                        productId={product.id}
+                        initialReviews={reviews}
+                    >
+                        <ReviewsSection productId={product.id} />
+                    </ReviewsProvider>
                 </section>
 
                 {/* Sản phẩm liên quan */}

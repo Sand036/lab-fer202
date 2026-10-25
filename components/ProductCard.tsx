@@ -43,6 +43,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                     {/* MỚI: ::after phủ kín thẻ để cả thẻ bấm được */}
                     <Link
                         href={`/products/${product.id}`}
+                        data-testid="link-detail"
                         className="after:absolute after:inset-0 after:content-['']"
                     >
                         {product.name}
